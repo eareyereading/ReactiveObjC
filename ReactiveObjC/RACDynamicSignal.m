@@ -7,7 +7,7 @@
 //
 
 #import "RACDynamicSignal.h"
-#import <ReactiveObjC/EXTScope.h>
+#import <ReactiveObjC/RACEXTScope.h>
 #import "RACCompoundDisposable.h"
 #import "RACPassthroughSubscriber.h"
 #import "RACScheduler+Private.h"
@@ -40,7 +40,11 @@
 	subscriber = [[RACPassthroughSubscriber alloc] initWithSubscriber:subscriber signal:self disposable:disposable];
 
 	if (self.didSubscribe != NULL) {
+		@weakify(self, disposable);
 		RACDisposable *schedulingDisposable = [RACScheduler.subscriptionScheduler schedule:^{
+			@strongify(self, disposable);
+			if (self == nil || disposable == nil) { return; }
+            
 			RACDisposable *innerDisposable = self.didSubscribe(subscriber);
 			[disposable addDisposable:innerDisposable];
 		}];

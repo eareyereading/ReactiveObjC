@@ -7,7 +7,7 @@
 //
 
 #import "RACSubject.h"
-#import <ReactiveObjC/EXTScope.h>
+#import <ReactiveObjC/RACEXTScope.h>
 #import "RACCompoundDisposable.h"
 #import "RACPassthroughSubscriber.h"
 
@@ -62,7 +62,11 @@
 		[subscribers addObject:subscriber];
 	}
 	
+	@weakify(subscribers, subscriber);
 	[disposable addDisposable:[RACDisposable disposableWithBlock:^{
+		@strongify(subscribers, subscriber);
+		if (subscribers == nil || subscriber == nil) { return; }
+       
 		@synchronized (subscribers) {
 			// Since newer subscribers are generally shorter-lived, search
 			// starting from the end of the list.

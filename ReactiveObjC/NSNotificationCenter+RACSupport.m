@@ -7,6 +7,7 @@
 //
 
 #import "NSNotificationCenter+RACSupport.h"
+#import <ReactiveObjC/RACEXTScope.h>
 #import "RACSignal.h"
 #import "RACSubscriber.h"
 #import "RACDisposable.h"
@@ -21,8 +22,9 @@
 			[subscriber sendNext:note];
 		}];
 
+		__weak typeof(self) wSelf = self;
 		return [RACDisposable disposableWithBlock:^{
-			[self removeObserver:observer];
+			[wSelf removeObserver:observer];
 		}];
 	}] setNameWithFormat:@"-rac_addObserverForName: %@ object: <%@: %p>", notificationName, [object class], object];
 }

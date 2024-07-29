@@ -8,7 +8,7 @@
 
 #import "RACSubscriber.h"
 #import "RACSubscriber+Private.h"
-#import <ReactiveObjC/EXTScope.h>
+#import <ReactiveObjC/RACEXTScope.h>
 #import "RACCompoundDisposable.h"
 
 @interface RACSubscriber ()
@@ -98,12 +98,12 @@
 	RACCompoundDisposable *selfDisposable = self.disposable;
 	[selfDisposable addDisposable:otherDisposable];
 
-	@unsafeify(otherDisposable);
+	@weakify(otherDisposable, selfDisposable);
 
 	// If this subscription terminates, purge its disposable to avoid unbounded
 	// memory growth.
 	[otherDisposable addDisposable:[RACDisposable disposableWithBlock:^{
-		@strongify(otherDisposable);
+		@strongify(otherDisposable, selfDisposable);
 		[selfDisposable removeDisposable:otherDisposable];
 	}]];
 }
